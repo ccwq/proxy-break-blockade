@@ -8,14 +8,13 @@ const proxyConfig = parse(readFileSync(resolve(__dirname, 'proxy.config.yml'), '
 
 // 构建代理配置
 const buildProxyConfig = (proxies) => {
-  return proxies.reduce((config, proxy) => {
+  const config =  proxies.reduce((config, proxy) => {
     if (proxy.simple) {
       // 简单字符串配置
       config[`/${proxy.id}`] = proxy.url
     } else {
       // 完整配置
-      const pattern = proxy.pattern || `^/${proxy.id}/.*`
-      config[pattern] = {
+      config[`/${proxy.id}`] = {
         target: proxy.url,
         changeOrigin: true,
         rewrite: (path) => path.replace(new RegExp(`^/${proxy.id}`), ''),
@@ -24,6 +23,9 @@ const buildProxyConfig = (proxies) => {
     }
     return config
   }, {})
+
+   debugger
+  return config
 }
 
 export default defineConfig({
