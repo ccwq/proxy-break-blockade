@@ -23,8 +23,6 @@ const buildProxyConfig = (proxies) => {
     }
     return config
   }, {})
-
-   debugger
   return config
 }
 

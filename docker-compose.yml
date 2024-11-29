@@ -4,6 +4,6 @@ services:
   proxy:
     build: .
     ports:
-      - "20080:8810"
+      - "20080:51731"
     restart: unless-stopped
     image: vite-proxy-abc
