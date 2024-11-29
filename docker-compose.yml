@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  proxy:
+    build: .
+    ports:
+      - "20080:8810"
+    restart: unless-stopped
+    image: vite-proxy-abc
