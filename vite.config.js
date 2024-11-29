@@ -37,7 +37,7 @@ export default defineConfig({
   server: {
     host: true, // 监听所有地址
     port: 51731, // 开发服务器端口号
-    open: true, // 自动打开浏览器
+    open: !process.env.DOCKER, // 在 Docker 环境中禁用自动打开浏览器
     cors: true, // 允许跨域
     proxy: buildProxyConfig(proxyConfig.proxies)
   },
