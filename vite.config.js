@@ -1,23 +1,30 @@
 import { defineConfig } from 'vite'
-const proxyList = [
-  {
-    id:"xai",
-    url:"https://api.x.ai"
-  },
-  {
-    id: "mistral",
-    url: "https://api.mistral.ai"
-  }
-]
+import { readFileSync } from 'fs'
+import { parse } from 'yaml'
+import { resolve } from 'path'
 
-const proxysConf = proxyList.reduce((pre, cur) => {
-  pre[`^/${cur.id}/.*`] = {
-    target: cur.url,
-    changeOrigin: true,
-    rewrite: (path) => path.replace(`^/${cur.id}`, ''),
-  }
-  return pre
-}, {})
+// 读取代理配置文件
+const proxyConfig = parse(readFileSync(resolve(__dirname, 'proxy.config.yml'), 'utf8'))
+
+// 构建代理配置
+const buildProxyConfig = (proxies) => {
+  return proxies.reduce((config, proxy) => {
+    if (proxy.simple) {
+      // 简单字符串配置
+      config[`/${proxy.id}`] = proxy.url
+    } else {
+      // 完整配置
+      const pattern = proxy.pattern || `^/${proxy.id}/.*`
+      config[pattern] = {
+        target: proxy.url,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(new RegExp(`^/${proxy.id}`), ''),
+        ws: proxy.ws || false
+      }
+    }
+    return config
+  }, {})
+}
 
 export default defineConfig({
   // 基本配置
@@ -30,34 +37,7 @@ export default defineConfig({
     port: 51731, // 开发服务器端口号
     open: true, // 自动打开浏览器
     cors: true, // 允许跨域
-    proxy: {
-      // 字符串简写写法
-      '/aaa': 'http://git.frp.trmap.cn/',
-      
-      // 选项写法
-      '/xai': {
-        target: 'https://api.x.ai/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/xai/, ''),
-        // 如果要代理 WebSockets
-        ws: true,
-      },
-      // 选项写法
-      '/mistral': {
-        target: 'https://api.mistral.ai/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/mistral/, ''),
-        // 如果要代理 WebSockets
-        ws: true,
-      },
-      
-      // 正则表达式写法
-      '^/fallback/.*': {
-        target: 'http://api.example.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/fallback/, ''),
-      },
-    },
+    proxy: buildProxyConfig(proxyConfig.proxies)
   },
 
   // 构建配置

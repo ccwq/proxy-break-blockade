@@ -1,0 +1,18 @@
+proxies:
+  # API 代理配置列表
+  - id: xai
+    url: https://api.x.ai
+    ws: true  # WebSocket 支持
+
+  - id: mistral
+    url: https://api.mistral.ai
+    ws: true  # WebSocket 支持
+
+  # 其他代理配置
+  - id: aaa
+    url: http://git.frp.trmap.cn
+    simple: true  # 使用简单字符串配置
+
+  - id: fallback
+    url: http://api.example.com
+    pattern: "^/fallback/.*"  # 自定义路径匹配模式
